@@ -3,6 +3,7 @@
 
 # 说明
 编译前需通过Android Studio IDE 安装必要的Android开发库，具体参见tauri v2文档 [https://v2.tauri.app/zh-cn/start/prerequisites/](https://v2.tauri.app/zh-cn/start/prerequisites/)
+需要自行修改Greet.vue文件中的树莓派url地址，后期考虑改为配置文件
 
 - 编译命令为
 ```
