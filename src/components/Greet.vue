@@ -8,7 +8,7 @@ const toastMessage = ref("");
 async function greet() {
   console.log("message: ", message.value);
   // 此处url写死，可考虑采用配置文件
-  const url = 'http://118.25.85.152:8080/?msg=' + message.value;
+  const url = 'http://127.0.0.1:8080/?msg=' + message.value;
   console.log("url: ", url);
   const response = await fetch(url);
   console.log("status: ", response.status);  // e.g. 200
