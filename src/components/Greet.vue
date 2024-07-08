@@ -1,120 +1,131 @@
 <script setup>
-import { ref } from "vue";
-import { fetch } from "@tauri-apps/plugin-http"
+import { onMounted, ref, reactive } from "vue";
+import { fetch } from "@tauri-apps/plugin-http";
+import { invoke } from "@tauri-apps/api/core";
+
+import {f7Page, f7Icon, f7Button, f7Input, f7Block, f7} from "framework7-vue"
 
 const message = ref("");
-const toastMessage = ref("");
 
-async function greet() {
-  console.log("message: ", message.value);
-  // 此处url写死，可考虑采用配置文件
-  const url = 'http://127.0.0.1:8080/?msg=' + message.value;
-  console.log("url: ", url);
-  const response = await fetch(url);
-  console.log("status: ", response.status);  // e.g. 200
-  console.log("text: ", response.statusText); // e.g. "OK"
-  if (response.status == "200") {
-      const jsonData = await response.json();
-      console.log("text11: ", jsonData.body);
-      // 在这里可以对获取的数据进行处理
-      toastMessage.value = "Hello. This is from raspiberry pi: " + jsonData.body + ".";
-      showToast()
-  } else {
-      toastMessage.value = "Message sent failed.";
-      showToast()
-  }
+const ipAddress = ref("");
+const port = ref("");
+
+const list = ref([]);
+const itemSelected = ref("");  
+
+import routes from '../router/index.js';
+
+const f7params= reactive({
+    // Array with app routes
+    routes: routes,         
+    // App Name
+    name: 'Greet', 
+})
+
+onMounted(async () => {  
+    getDataFromStore();
+}) 
+
+async function getDataFromStore () {
+    let result = await invoke('read_config');
+    let jsonObject = JSON.parse(result);
+    ipAddress.value = jsonObject.ip;
+    port.value = jsonObject.port;
+    
+    console.log(ipAddress.value)
+    console.log(port.value)
+
+    let messageList = await invoke('list_message');
+    let jsonList = JSON.parse(messageList);
+    list.value = jsonList;
+    console.log("list: ", list.value);
 }
 
-function showToast() {
-    var toast = document.getElementById("toast");
-    toast.className = "toast show";
-    setTimeout(function() {
-        toast.className = toast.className.replace("show", "");
-    }, 3000);
-}    
+async function greet() {
+  // 此处url写死，可考虑采用配置文件
+  const url = 'http://' + ipAddress.value + ':' + port.value + '/?msg=' + message.value;
+  console.log("url: ", url);
+  try {
+    const response = await fetch(url);
+    if (response.status == "200") {
+      const jsonData = await response.json();
+      // 在这里可以对获取的数据进行处理
+      let text = "Hello. This is from raspiberry pi: " + jsonData.body + ".";
+      showToastCenter(text);
+      await invoke('save_message', {message: message.value});
+    } else {
+      let text = "Message sent failed.";
+      showToastCenter(text);
+    }
+  } catch (e) {
+      console.log("fetch error: ", e);
+      let text = "Message sent failed.";
+      showToastCenter(text);
+  }
+  
+} 
+
+  async function showToastCenter(text) {
+    let toastCenter = f7.toast.create({
+      text: text,
+      position: 'center',
+      closeTimeout: 2000,
+    });
+    // Open it
+    console.log("toast: ", toastCenter);
+    toastCenter.open();
+  }
+
+  function select() {
+    console.log("itemSelected: ", itemSelected.value);
+    message.value = itemSelected.value;
+  }
+
 </script>
 
 <template>
-  <div class="body">
-    <div class="container">
-        <input type="text" placeholder="Enter your message" v-model="message">
-        <button @click="greet()">Send</button>
-    </div>
-    <div id="toast" class="toast">{{ toastMessage }}</div> 
-  </div>  
-</template>
+    <f7-page name="greet">
+      <div class="title">
+        <h1>Send Message</h1>
+      </div>
+      <f7-card class="card"> 
+        <div class="input-container">
+          <f7-input type="text" placeholder="输入要发送的消息" v-model:value="message" clear-button inputStyle="width: 300px; height: 2em;"></f7-input> 
+        </div>
+        <div class="button-container">
+          <f7-button @click="greet()" small tonal round style="width: 100px;">发送</f7-button> 
+        </div>
+      </f7-card>
+    </f7-page>  
+</template>  
+   
+<style scoped> 
+  .input-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 0px;
+      margin-bottom: 20px;
+  }
+  .button-container {
+      display: flex;
+      justify-content: center;
+  }
 
-<style scoped>
-.body {
-    font-family: Arial, sans-serif;
-    background-color: #d3d3d3; /* 浅灰色背景 */
-    margin: 0;
-    padding: 0;
+  h1 {
+    font-size: 30px;
+    margin-bottom: 0px;  
+    color: #333;
+    padding: 50px; /* 可选：增加内边距 */
+  }
+
+  .title {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden; /* 防止滚动条出现 */
-}
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
 
-.container {
-    width: 100%;
-    height: 100vh; /* 占满视口高度 */
-    background-color: #fff;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-input[type="text"] {
-    width: 100%;
-    max-width: 400px; /* 最大宽度 */
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-button {
-    width: 100%;
-    max-width: 400px; /* 最大宽度 */
-    padding: 10px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-.toast {
-    visibility: hidden;
-    min-width: 250px;
-    margin-left: -125px;
-    background-color: #87ceeb; /* 浅蓝色背景 */
-    color: #fff;
-    text-align: center;
-    border-radius: 12px; /* 圆角 */
-    padding: 16px;
-    position: fixed;
-    z-index: 1;
-    left: 50%;
-    top: -50px;
-    font-size: 17px;
-    transition: top 0.5s, visibility 0.5s;
-}
-
-.toast.show {
-    visibility: visible;
-    top: 30px;
-}
-
+  .card {
+    height: 100px;
+    padding-top: 50px;
+  }
 </style>

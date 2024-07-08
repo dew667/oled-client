@@ -1,130 +1,78 @@
-<script setup>
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-import Greet from "./components/Greet.vue";
-</script>
+<!-- app.vue -->
 
 <template>
-    <Greet />
+  <!-- Main Framework7 App component where we pass Framework7 params -->
+  <f7-app v-bind="f7params">
+  <!-- Your main view,
+    <!-- Initial Page -->
+    <f7-page>
+      <!-- Top Navbar-->
+      <f7-navbar>
+        <f7-link tab-link="#tab-3" href="/settings">
+          <f7-icon class="gear" f7="gear_alt"></f7-icon>
+        </f7-link>
+      </f7-navbar>
+      <f7-views tabs>
+        <f7-view id="tab-1" tab tab-active url="/greet"></f7-view>  
+        <f7-view id="tab-2" tab url="/raspSysInfo"></f7-view>   
+        <f7-view id="tab-3" tab url="/settings"></f7-view>
+        <f7-view id="tab-4" tab url="/networkConfig"></f7-view>
+        <f7-view id="tab-5" tab url="/about"></f7-view>
+      </f7-views>
+      <f7-toolbar position="bottom" tabbar icons>   
+        <f7-link
+          tab-link="#tab-1"
+          tab-link-active
+          href="/greet"
+        ><f7-icon f7="chat_bubble_text_fill"></f7-icon></f7-link>
+        <f7-link
+          tab-link="#tab-2"
+          href="/raspSysInfo"
+        ><f7-icon f7="info_circle_fil"></f7-icon></f7-link>
+        <f7-link
+          tab-link="#tab-3"
+          href="/settings"
+        ><f7-icon f7="wrench_fill"></f7-icon></f7-link>
+    </f7-toolbar>
+    </f7-page>
+  </f7-app>
 </template>
+<script>  
+  import routes from './router/index.js';  
+  import {f7Page, f7Panel, f7App, f7Block, f7Link, f7Button, f7View, f7Navbar, f7Toolbar, f7Views, f7Icon} from "framework7-vue";
+  import 'framework7-icons';
+
+  export default {
+    components: {
+      f7Page,
+      f7Block,
+      f7Button,
+      f7Link,
+      f7Panel,
+      f7App,
+      f7View,
+      f7Navbar,
+      f7Toolbar,
+      f7Views,
+      f7Icon
+    },
+    data() {
+      return {
+        // Framework7 parameters that we pass to <f7-app> component
+        f7params: {
+          // Array with app routes
+          routes,         
+          // App Name
+          name: 'My App',    
+          // ...  
+        } 
+      }
+    }
+  }
+</script>
 
 <style scoped>
-.bg {
-  color: #e8e6f0;
-  background-color: #e8e6f0;
-  height: 800px;
-  width: 600px;
-}
-
-:root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
-
-
-  color: #33cccc;
-  background-color: black;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-}
-
-.container {
-  margin: 0;
-  padding-top: 10vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
-}
-
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
-}
-
-.row {
-  display: flex;
-  justify-content: center;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
-h1 {
-  text-align: center;
-}
-
-input,
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-button {
-  cursor: pointer;
-}
-
-button:hover {
-  border-color: #396cd8;
-}
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
-}
-
-input,
-button {
-  outline: none;
-}
-
-#greet-input {
-  margin-right: 5px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
+  .gear {
+      margin-left: 20px; /* 可选：增加左外边距 */
   }
-
-  a:hover {
-    color: #24c8db;
-  }
-
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-  }
-  button:active {
-    background-color: #0f0f0f69;
-  }
-}
-
 </style>

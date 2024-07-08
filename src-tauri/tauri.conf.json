@@ -13,11 +13,15 @@
       {
         "title": "oled-client",
         "width": 600,
-        "height": 800
+        "height": 800,  
+        "decorations": false,
+        "fullscreen": true,
+        "titleBarStyle": "Overlay"
       }
     ],
     "security": {
       "csp": null
+      
     }
   },
   "bundle": {
